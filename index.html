@@ -1,0 +1,1348 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7fb">
+  <title>KasKelas — Keuangan Tempat Les</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17233c;
+      --muted: #71809a;
+      --line: #e8ebf2;
+      --paper: #fff;
+      --canvas: #f6f7fb;
+      --blue: #4667e8;
+      --blue-dark: #3453ce;
+      --green: #14866d;
+      --red: #d34b5b;
+      --shadow: 0 12px 35px rgba(37, 51, 82, .07);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app-shell { max-width: 1160px; margin: 0 auto; padding: 34px 28px 56px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      place-items: center;
+      border-radius: 15px;
+      background: #e9edff;
+      color: var(--blue);
+      font-size: 23px;
+    }
+    .brand h1 { margin: 0; font-size: 20px; letter-spacing: -.5px; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 43px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 650;
+      box-shadow: 0 5px 13px rgba(70, 103, 232, .2);
+      transition: background .15s, transform .15s;
+    }
+    .button:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .button:focus-visible, .icon-button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(70, 103, 232, .25);
+      outline-offset: 2px;
+    }
+    .button.secondary { background: #eef1ff; color: var(--blue); box-shadow: none; }
+    .button.secondary:hover { background: #e4e9ff; }
+
+    .welcome { margin-bottom: 22px; }
+    .welcome h2 { margin: 0; font-size: clamp(24px, 3vw, 30px); letter-spacing: -.8px; }
+    .welcome p { margin: 5px 0 0; color: var(--muted); }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .summary-card, .panel {
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .summary-card { min-height: 136px; padding: 19px 21px; }
+    .summary-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 13px; font-weight: 550; }
+    .summary-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 11px; background: #f1f3ff; color: var(--blue); font-size: 16px; }
+    .summary-card:nth-child(2) .summary-icon { background: #eaf8f3; color: var(--green); }
+    .summary-card:nth-child(3) .summary-icon { background: #fff3e8; color: #cc7a24; }
+    .summary-value { margin-top: 11px; font-size: clamp(20px, 2.4vw, 26px); font-weight: 750; letter-spacing: -.7px; overflow-wrap: anywhere; }
+    .summary-note { margin-top: 3px; color: #8994a8; font-size: 12px; }
+
+    .panel { margin-top: 22px; overflow: hidden; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 21px 22px 17px; }
+    .panel-heading h3 { margin: 0; font-size: 17px; letter-spacing: -.25px; }
+    .panel-heading p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+    .filters { display: flex; align-items: center; gap: 9px; }
+    .field-control {
+      height: 39px;
+      min-width: 145px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .search-control { width: 180px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    thead { background: #fafbfe; }
+    th { padding: 11px 20px; color: #8490a5; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+    td { padding: 14px 20px; border-top: 1px solid #f0f1f5; font-size: 13px; vertical-align: middle; }
+    tbody tr:hover { background: #fcfcff; }
+    .expense-name { font-weight: 650; color: #25334e; }
+    .expense-category { margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .amount { white-space: nowrap; font-weight: 700; }
+    .actions { display: flex; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+    .icon-button {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #7d89a0;
+    }
+    .icon-button:hover { border-color: var(--line); background: white; color: var(--blue); }
+    .icon-button.delete:hover { color: var(--red); }
+    .empty-state { padding: 48px 20px; text-align: center; }
+    .empty-icon { display: grid; width: 48px; height: 48px; margin: 0 auto 12px; place-items: center; border-radius: 15px; background: #f1f3ff; color: var(--blue); font-size: 22px; }
+    .empty-state strong { display: block; font-size: 14px; }
+    .empty-state p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .table-footer { display: flex; justify-content: space-between; gap: 12px; padding: 14px 21px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .notice { margin: 16px 0 0; padding: 12px 14px; border-radius: 10px; background: #fff1f0; color: #a53d3d; font-size: 13px; }
+    .storage-note { display: flex; align-items: center; gap: 8px; margin-top: 18px; color: #8490a5; font-size: 12px; }
+    .storage-note span { color: var(--green); }
+    .view-nav { display: flex; gap: 7px; margin: -12px 0 25px; padding: 5px; width: fit-content; border: 1px solid var(--line); border-radius: 12px; background: white; }
+    .nav-button { min-height: 36px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-weight: 650; }
+    .nav-button[aria-current="page"] { background: #eef1ff; color: var(--blue); }
+    .payment-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .payment-status.paid { background: #eaf8f3; color: var(--green); }
+    .payment-status.unpaid { background: #fff3e8; color: #b4691d; }
+    .payment-action { min-height: 33px; padding: 0 11px; border: 0; border-radius: 8px; background: #eef1ff; color: var(--blue); font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .payment-action:hover { background: #e2e8ff; }
+    .payment-action.danger { background: #fff1f0; color: var(--red); }
+    .student-actions { display: flex; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+    .student-name-link { padding: 0; border: 0; background: transparent; color: var(--blue); font: inherit; font-weight: 700; text-align: left; }
+    .student-name-link:hover { color: var(--blue-dark); text-decoration: underline; }
+    .student-name-link:focus-visible { outline: 3px solid rgba(70, 103, 232, .25); outline-offset: 3px; border-radius: 3px; }
+    .history-dialog { max-height: min(80vh, 680px); overflow-y: auto; }
+    .history-note { margin: 0; padding: 0 22px 14px; color: var(--muted); font-size: 13px; }
+    .history-total { display: flex; justify-content: space-between; gap: 12px; margin: 0 22px 15px; padding: 12px 14px; border-radius: 10px; background: #f5f6fb; font-size: 13px; }
+    .history-total strong { white-space: nowrap; }
+    .history-table-wrap { padding: 0 12px 16px; }
+    .history-table th, .history-table td { padding: 11px 10px; }
+    .photo-preview { display: block; max-width: 100%; max-height: 190px; margin-top: 10px; border: 1px solid var(--line); border-radius: 10px; }
+    .field-hint { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .proof-dialog { width: min(760px, calc(100% - 32px)); }
+    .proof-image-wrap { padding: 0 20px 20px; text-align: center; }
+    .proof-image { display: block; max-width: 100%; max-height: 70vh; margin: 0 auto; object-fit: contain; border-radius: 10px; }
+
+    dialog {
+      width: min(460px, calc(100% - 32px));
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      color: var(--ink);
+      box-shadow: 0 24px 80px rgba(28, 38, 63, .22);
+    }
+    dialog::backdrop { background: rgba(25, 34, 54, .38); backdrop-filter: blur(2px); }
+    .dialog-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 21px 22px 13px; }
+    .dialog-header h2 { margin: 0; font-size: 19px; }
+    .dialog-header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .close-button { border: 0; background: transparent; color: var(--muted); font-size: 23px; line-height: 1; }
+    .expense-form { display: grid; gap: 14px; padding: 8px 22px 22px; }
+    .form-field label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 650; }
+    .form-field input, .form-field select { width: 100%; height: 42px; padding: 0 11px; border: 1px solid #dfe3ec; border-radius: 9px; background: white; color: var(--ink); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-error { margin: 0; color: var(--red); font-size: 12px; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 3px; }
+
+    @media (max-width: 760px) {
+      .app-shell { padding: 23px 16px 40px; }
+      .summary-grid { grid-template-columns: 1fr; gap: 11px; }
+      .summary-card { min-height: 112px; padding: 16px 18px; }
+      .summary-value { margin-top: 7px; }
+      .panel-heading { align-items: flex-start; flex-direction: column; padding: 18px 17px 14px; }
+      .filters { width: 100%; flex-wrap: wrap; }
+      .field-control { flex: 1; min-width: 130px; }
+      .search-control { width: 100%; }
+      th, td { padding-right: 14px; padding-left: 14px; }
+    }
+    @media (max-width: 450px) {
+      .topbar { align-items: flex-start; flex-wrap: wrap; }
+      .brand-mark { width: 40px; height: 40px; }
+      .brand h1 { font-size: 18px; }
+      .topbar > .button { width: 42px; min-width: 42px; padding: 0; font-size: 0; }
+      .topbar > .button span { font-size: 22px; }
+      .topbar > #telegram-settings { width: auto; min-width: 0; min-height: 36px; margin-left: auto; padding: 0 11px; font-size: 12px; }
+      .form-row { grid-template-columns: 1fr; }
+      .table-footer { flex-direction: column; }
+      .view-nav { width: 100%; }
+      .nav-button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">✦</div>
+        <div>
+          <h1>KasKelas</h1>
+          <p>Keuangan tempat les Anda</p>
+        </div>
+      </div>
+      <button class="button" id="add-expense" type="button"><span aria-hidden="true">＋</span> Catat biaya</button>
+      <button class="button secondary" id="telegram-settings" type="button" aria-label="Pengaturan Telegram">Telegram</button>
+    </header>
+
+    <nav class="view-nav" aria-label="Menu keuangan">
+      <button class="nav-button" type="button" data-view="expenses-view" aria-current="page">Biaya operasional</button>
+      <button class="nav-button" type="button" data-view="payments-view">Pembayaran siswa</button>
+    </nav>
+
+    <div id="expenses-view">
+    <section class="welcome" aria-labelledby="page-title">
+      <h2 id="page-title">Biaya operasional</h2>
+      <p>Pantau pengeluaran tempat les bahasa Inggris dengan lebih mudah.</p>
+    </section>
+
+    <section class="summary-grid" aria-label="Ringkasan pengeluaran">
+      <article class="summary-card">
+        <div class="summary-top"><span>Total pengeluaran bulan ini</span><span class="summary-icon" aria-hidden="true">↗</span></div>
+        <div class="summary-value" id="monthly-total">Rp0</div>
+        <div class="summary-note" id="month-label">Bulan ini</div>
+      </article>
+      <article class="summary-card">
+        <div class="summary-top"><span>Transaksi bulan ini</span><span class="summary-icon" aria-hidden="true">▤</span></div>
+        <div class="summary-value" id="monthly-count">0</div>
+        <div class="summary-note">Biaya yang sudah dicatat</div>
+      </article>
+      <article class="summary-card">
+        <div class="summary-top"><span>Rata-rata per transaksi</span><span class="summary-icon" aria-hidden="true">◷</span></div>
+        <div class="summary-value" id="monthly-average">Rp0</div>
+        <div class="summary-note">Berdasarkan transaksi bulan ini</div>
+      </article>
+    </section>
+
+    <section class="panel" aria-labelledby="list-title">
+      <div class="panel-heading">
+        <div>
+          <h3 id="list-title">Riwayat biaya</h3>
+          <p>Semua pengeluaran operasional tempat les</p>
+        </div>
+        <div class="filters">
+          <label class="sr-only" for="month-filter">Filter bulan</label>
+          <input class="field-control" id="month-filter" type="month" aria-label="Filter bulan">
+          <label class="sr-only" for="category-filter">Filter kategori</label>
+          <select class="field-control" id="category-filter" aria-label="Filter kategori">
+            <option value="">Semua kategori</option>
+          </select>
+          <label class="sr-only" for="search-filter">Cari biaya</label>
+          <input class="field-control search-control" id="search-filter" type="search" placeholder="Cari biaya..." aria-label="Cari biaya">
+          <button class="button secondary" id="export-csv" type="button">Unduh CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Biaya</th>
+              <th scope="col">Tanggal</th>
+              <th scope="col">Kategori</th>
+              <th scope="col">Jumlah</th>
+              <th scope="col"><span class="sr-only">Tindakan</span></th>
+            </tr>
+          </thead>
+          <tbody id="expense-rows"></tbody>
+        </table>
+        <div class="empty-state" id="empty-state" hidden>
+          <div class="empty-icon" aria-hidden="true">＋</div>
+          <strong id="empty-title">Belum ada biaya yang dicatat</strong>
+          <p id="empty-message">Catat pengeluaran pertama tempat les Anda.</p>
+        </div>
+      </div>
+      <div class="table-footer">
+        <span id="results-count">Menampilkan 0 biaya</span>
+        <span id="filtered-total">Total: Rp0</span>
+      </div>
+    </section>
+    </div>
+
+    <div id="payments-view" hidden>
+      <section class="welcome" aria-labelledby="payments-title">
+        <h2 id="payments-title">Pembayaran siswa</h2>
+        <p>Kelola pembayaran bulanan dan pantau siswa yang belum membayar.</p>
+      </section>
+
+      <section class="summary-grid" aria-label="Ringkasan pembayaran bulan ini">
+        <article class="summary-card">
+          <div class="summary-top"><span>Tagihan bulan ini</span><span class="summary-icon" aria-hidden="true">▤</span></div>
+          <div class="summary-value" id="payment-expected">Rp0</div>
+          <div class="summary-note" id="payment-month-label">Bulan ini</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-top"><span>Sudah dibayar</span><span class="summary-icon" aria-hidden="true">✓</span></div>
+          <div class="summary-value" id="payment-received">Rp0</div>
+          <div class="summary-note" id="payment-paid-count">0 siswa membayar</div>
+        </article>
+        <article class="summary-card">
+          <div class="summary-top"><span>Sisa tagihan</span><span class="summary-icon" aria-hidden="true">◷</span></div>
+          <div class="summary-value" id="payment-pending">Rp0</div>
+          <div class="summary-note" id="payment-pending-count">0 siswa belum membayar</div>
+        </article>
+      </section>
+
+      <section class="panel" aria-labelledby="students-title">
+        <div class="panel-heading">
+          <div>
+            <h3 id="students-title">Daftar siswa</h3>
+            <p>Catat tarif bulanan dan status pembayaran setiap siswa.</p>
+          </div>
+          <div class="filters">
+            <label class="sr-only" for="payment-month-filter">Bulan pembayaran</label>
+            <input class="field-control" id="payment-month-filter" type="month" aria-label="Bulan pembayaran">
+            <label class="sr-only" for="student-search">Cari siswa</label>
+            <input class="field-control search-control" id="student-search" type="search" placeholder="Cari siswa..." aria-label="Cari siswa">
+            <button class="button secondary" id="export-payments" type="button">Unduh CSV</button>
+            <button class="button" id="add-student" type="button"><span aria-hidden="true">＋</span> Tambah siswa</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Nama siswa</th>
+                <th scope="col">Biaya bulanan</th>
+                <th scope="col">Status bulan ini</th>
+                <th scope="col">Sisa kekurangan</th>
+                <th scope="col">Tanggal bayar</th>
+                <th scope="col"><span class="sr-only">Tindakan</span></th>
+              </tr>
+            </thead>
+            <tbody id="student-rows"></tbody>
+          </table>
+          <div class="empty-state" id="students-empty-state" hidden>
+            <div class="empty-icon" aria-hidden="true">＋</div>
+            <strong id="students-empty-title">Belum ada siswa</strong>
+            <p id="students-empty-message">Tambahkan siswa untuk mulai mencatat pembayaran bulanan.</p>
+          </div>
+        </div>
+        <div class="table-footer">
+          <span id="students-count">0 siswa</span>
+          <span id="payment-filtered-total">Sudah diterima: Rp0</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="storage-note"><span aria-hidden="true">●</span> Data tersimpan di browser pada perangkat ini.</div>
+    <div class="notice" id="storage-error" role="alert" hidden></div>
+  </main>
+
+  <dialog id="expense-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-header">
+      <div>
+        <h2 id="dialog-title">Catat biaya</h2>
+        <p>Isi detail pengeluaran operasional.</p>
+      </div>
+      <button class="close-button" id="close-dialog" type="button" aria-label="Tutup">×</button>
+    </div>
+    <form class="expense-form" id="expense-form">
+      <input id="expense-id" type="hidden">
+      <div class="form-field">
+        <label for="expense-name">Nama biaya</label>
+        <input id="expense-name" name="name" type="text" maxlength="80" placeholder="Contoh: Tagihan listrik" required>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="expense-amount">Jumlah (Rp)</label>
+          <input id="expense-amount" name="amount" type="number" min="1" step="1" inputmode="numeric" placeholder="250000" required>
+        </div>
+        <div class="form-field">
+          <label for="expense-date">Tanggal</label>
+          <input id="expense-date" name="date" type="date" required>
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="expense-category">Kategori</label>
+        <select id="expense-category" name="category" required></select>
+      </div>
+      <p class="form-error" id="form-error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button class="button secondary" id="cancel-dialog" type="button">Batal</button>
+        <button class="button" type="submit">Simpan biaya</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="payment-history-dialog" class="history-dialog" aria-labelledby="payment-history-title">
+    <div class="dialog-header">
+      <div>
+        <h2 id="payment-history-title">Riwayat pembayaran</h2>
+        <p id="payment-history-subtitle"></p>
+      </div>
+      <button class="close-button" id="close-payment-history" type="button" aria-label="Tutup">×</button>
+    </div>
+    <p class="history-note">Setiap pembayaran tambahan dicatat sebagai transaksi tersendiri. Catatan lama yang sebelumnya digabung tetap ditampilkan sesuai data yang tersimpan.</p>
+    <div class="history-total"><span>Total pembayaran tercatat</span><strong id="payment-history-total">Rp0</strong></div>
+    <div class="table-wrap history-table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th scope="col">Bulan</th>
+            <th scope="col">Jumlah dibayar</th>
+            <th scope="col">Tanggal pembayaran</th>
+            <th scope="col">Bukti</th>
+          </tr>
+        </thead>
+        <tbody id="payment-history-rows"></tbody>
+      </table>
+      <div class="empty-state" id="payment-history-empty" hidden>
+        <strong>Belum ada riwayat pembayaran</strong>
+        <p>Pembayaran siswa ini akan muncul di sini.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="student-dialog" aria-labelledby="student-dialog-title">
+    <div class="dialog-header">
+      <div>
+        <h2 id="student-dialog-title">Tambah siswa</h2>
+        <p>Masukkan nama dan biaya les per bulan.</p>
+      </div>
+      <button class="close-button" id="close-student-dialog" type="button" aria-label="Tutup">×</button>
+    </div>
+    <form class="expense-form" id="student-form">
+      <input id="student-id" type="hidden">
+      <div class="form-field">
+        <label for="student-name">Nama siswa</label>
+        <input id="student-name" type="text" maxlength="80" placeholder="Contoh: Nadia Putri" required>
+      </div>
+      <div class="form-field">
+        <label for="student-fee">Biaya les per bulan (Rp)</label>
+        <input id="student-fee" type="number" min="1" step="1" inputmode="numeric" placeholder="500000" required>
+      </div>
+      <p class="form-error" id="student-form-error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button class="button secondary" id="cancel-student-dialog" type="button">Batal</button>
+        <button class="button" type="submit">Simpan siswa</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="payment-dialog" aria-labelledby="payment-dialog-title">
+    <div class="dialog-header">
+      <div>
+        <h2 id="payment-dialog-title">Catat pembayaran</h2>
+        <p id="payment-dialog-description">Catat pembayaran bulanan siswa.</p>
+      </div>
+      <button class="close-button" id="close-payment-dialog" type="button" aria-label="Tutup">×</button>
+    </div>
+    <form class="expense-form" id="payment-form">
+      <input id="payment-student-id" type="hidden">
+      <div class="form-field">
+        <label for="payment-amount">Jumlah dibayar (Rp)</label>
+        <input id="payment-amount" type="number" min="1" step="1" inputmode="numeric" required>
+      </div>
+      <div class="form-field">
+        <label for="payment-date">Tanggal pembayaran</label>
+        <input id="payment-date" type="date" required>
+      </div>
+      <div class="form-field">
+        <label for="payment-proof">Foto bukti pembayaran</label>
+        <input id="payment-proof" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp" aria-describedby="payment-proof-hint" required>
+        <p class="field-hint" id="payment-proof-hint">Format JPG, PNG, WebP, GIF, atau BMP; maksimal 10 MB.</p>
+        <img class="photo-preview" id="payment-proof-preview" alt="Pratinjau foto bukti pembayaran" hidden>
+      </div>
+      <p class="form-error" id="payment-form-error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button class="button secondary" id="cancel-payment-dialog" type="button">Batal</button>
+        <button class="button" type="submit">Simpan pembayaran</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="proof-dialog" class="proof-dialog" aria-labelledby="proof-dialog-title">
+    <div class="dialog-header">
+      <div>
+        <h2 id="proof-dialog-title">Bukti pembayaran</h2>
+        <p id="proof-dialog-caption"></p>
+      </div>
+      <button class="close-button" id="close-proof-dialog" type="button" aria-label="Tutup">×</button>
+    </div>
+    <div class="proof-image-wrap"><img class="proof-image" id="proof-image" alt="Foto bukti pembayaran"></div>
+  </dialog>
+
+  <dialog id="telegram-settings-dialog" aria-labelledby="telegram-settings-title">
+    <div class="dialog-header">
+      <div>
+        <h2 id="telegram-settings-title">Notifikasi Telegram</h2>
+        <p>Hubungkan Worker untuk menerima pesan setiap transaksi dicatat.</p>
+      </div>
+      <button class="close-button" id="close-telegram-settings" type="button" aria-label="Tutup">×</button>
+    </div>
+    <form class="expense-form" id="telegram-settings-form">
+      <div class="form-field">
+        <label for="telegram-worker-url">URL Cloudflare Worker</label>
+        <input id="telegram-worker-url" type="url" inputmode="url" placeholder="https://nama-worker.username.workers.dev/notify" autocomplete="url">
+        <p class="field-hint">URL Worker bukan token rahasia. Token Telegram disimpan di pengaturan secret Cloudflare.</p>
+      </div>
+      <p class="form-error" id="telegram-settings-error" role="alert" hidden></p>
+      <div class="form-actions">
+        <button class="button secondary" id="cancel-telegram-settings" type="button">Batal</button>
+        <button class="button" type="submit">Simpan pengaturan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <style>
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  </style>
+  <script>
+    (() => {
+      const STORAGE_KEY = "kaskelas-expenses-v1";
+      const STUDENTS_KEY = "kaskelas-students-v1";
+      const PAYMENTS_KEY = "kaskelas-payments-v1";
+      const EVIDENCE_DB_NAME = "kaskelas-payment-evidence-v1";
+      const EVIDENCE_STORE_NAME = "photos";
+      const MAX_EVIDENCE_SIZE = 10 * 1024 * 1024;
+      const TELEGRAM_WORKER_KEY = "kaskelas-telegram-worker-url-v1";
+      const categories = [
+        "Sewa tempat", "Gaji & honor", "Listrik & internet", "Perlengkapan belajar",
+        "Promosi", "Transportasi", "Konsumsi", "Lainnya"
+      ];
+      const byId = (id) => document.getElementById(id);
+      const money = new Intl.NumberFormat("id-ID", {
+        style: "currency", currency: "IDR", maximumFractionDigits: 0
+      });
+      const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" });
+      const dateFormatter = new Intl.DateTimeFormat("id-ID", {
+        day: "numeric", month: "short", year: "numeric", timeZone: "UTC"
+      });
+      const today = new Date();
+      const todayString = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0")
+      ].join("-");
+      const currentMonth = todayString.slice(0, 7);
+      let errorMessage = "";
+      let expenses = loadExpenses();
+      let students = loadStudents();
+      let payments = loadPayments();
+      let evidenceDbPromise;
+      let paymentProofPreviewUrl = "";
+      let proofImageUrl = "";
+      let telegramWorkerUrl = loadTelegramWorkerUrl();
+
+      const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+
+      function loadExpenses() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return [];
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed)) throw new Error("Format data biaya tidak valid.");
+          return parsed.filter((item) =>
+            item && typeof item.id === "string" &&
+            typeof item.name === "string" &&
+            Number.isFinite(item.amount) && item.amount > 0 &&
+            typeof item.date === "string" &&
+            categories.includes(item.category)
+          );
+        } catch (error) {
+          errorMessage = `Data biaya tidak dapat dibaca: ${error.message}`;
+          return [];
+        }
+      }
+
+      function loadStudents() {
+        try {
+          const stored = localStorage.getItem(STUDENTS_KEY);
+          if (!stored) return [];
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed)) throw new Error("Format data siswa tidak valid.");
+          return parsed.filter((item) =>
+            item && typeof item.id === "string" &&
+            typeof item.name === "string" && item.name.trim() &&
+            Number.isSafeInteger(item.monthlyFee) && item.monthlyFee > 0
+          );
+        } catch (error) {
+          errorMessage = `Data siswa tidak dapat dibaca: ${error.message}`;
+          return [];
+        }
+      }
+
+      function loadPayments() {
+        try {
+          const stored = localStorage.getItem(PAYMENTS_KEY);
+          if (!stored) return [];
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed)) throw new Error("Format data pembayaran tidak valid.");
+          return parsed.filter((item) =>
+            item && typeof item.studentId === "string" &&
+            /^\d{4}-\d{2}$/.test(item.month) &&
+            Number.isSafeInteger(item.amount) && item.amount > 0 &&
+            /^\d{4}-\d{2}-\d{2}$/.test(item.date)
+          );
+        } catch (error) {
+          errorMessage = `Data pembayaran tidak dapat dibaca: ${error.message}`;
+          return [];
+        }
+      }
+
+      function saveExpenses() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+          errorMessage = "";
+          return true;
+        } catch (error) {
+          errorMessage = `Data gagal disimpan di browser: ${error.message}`;
+          renderNotice();
+          return false;
+        }
+      }
+
+      function saveStudents() {
+        try {
+          localStorage.setItem(STUDENTS_KEY, JSON.stringify(students));
+          errorMessage = "";
+          return true;
+        } catch (error) {
+          errorMessage = `Data siswa gagal disimpan di browser: ${error.message}`;
+          renderNotice();
+          return false;
+        }
+      }
+
+      function savePayments() {
+        try {
+          localStorage.setItem(PAYMENTS_KEY, JSON.stringify(payments));
+          errorMessage = "";
+          return true;
+        } catch (error) {
+          errorMessage = `Data pembayaran gagal disimpan di browser: ${error.message}`;
+          renderNotice();
+          return false;
+        }
+      }
+
+      function openEvidenceDatabase() {
+        if (!("indexedDB" in window)) {
+          return Promise.reject(new Error("Penyimpanan foto tidak didukung browser ini."));
+        }
+        if (!evidenceDbPromise) {
+          evidenceDbPromise = new Promise((resolve, reject) => {
+            const request = indexedDB.open(EVIDENCE_DB_NAME, 1);
+            request.onupgradeneeded = () => {
+              const database = request.result;
+              if (!database.objectStoreNames.contains(EVIDENCE_STORE_NAME)) {
+                database.createObjectStore(EVIDENCE_STORE_NAME, { keyPath: "id" });
+              }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error || new Error("Penyimpanan foto tidak dapat dibuka."));
+            request.onblocked = () => reject(new Error("Penyimpanan foto sedang dipakai tab lain. Tutup tab KasKelas lain lalu coba lagi."));
+          });
+        }
+        return evidenceDbPromise;
+      }
+
+      async function storeEvidence(id, file) {
+        const database = await openEvidenceDatabase();
+        return new Promise((resolve, reject) => {
+          const transaction = database.transaction(EVIDENCE_STORE_NAME, "readwrite");
+          transaction.objectStore(EVIDENCE_STORE_NAME).put({
+            id,
+            blob: file,
+            name: file.name,
+            type: file.type
+          });
+          transaction.oncomplete = () => resolve();
+          transaction.onerror = () => reject(transaction.error || new Error("Foto bukti gagal disimpan."));
+          transaction.onabort = () => reject(transaction.error || new Error("Penyimpanan foto dibatalkan."));
+        });
+      }
+
+      async function readEvidence(id) {
+        const database = await openEvidenceDatabase();
+        return new Promise((resolve, reject) => {
+          const transaction = database.transaction(EVIDENCE_STORE_NAME, "readonly");
+          const request = transaction.objectStore(EVIDENCE_STORE_NAME).get(id);
+          request.onsuccess = () => resolve(request.result || null);
+          request.onerror = () => reject(request.error || new Error("Foto bukti tidak dapat dibaca."));
+        });
+      }
+
+      async function removeEvidence(id) {
+        const database = await openEvidenceDatabase();
+        return new Promise((resolve, reject) => {
+          const transaction = database.transaction(EVIDENCE_STORE_NAME, "readwrite");
+          transaction.objectStore(EVIDENCE_STORE_NAME).delete(id);
+          transaction.oncomplete = () => resolve();
+          transaction.onerror = () => reject(transaction.error || new Error("Foto bukti gagal dihapus."));
+          transaction.onabort = () => reject(transaction.error || new Error("Penghapusan foto dibatalkan."));
+        });
+      }
+
+      async function removeEvidenceForPayments(records) {
+        const ids = records.filter((payment) => payment.evidenceId).map((payment) => payment.evidenceId);
+        const results = await Promise.allSettled(ids.map((id) => removeEvidence(id)));
+        const failed = results.filter((result) => result.status === "rejected");
+        if (failed.length) {
+          errorMessage = `Catatan pembayaran dihapus, tetapi ${failed.length} foto bukti tidak dapat dihapus: ${failed[0].reason.message}`;
+        }
+      }
+
+      function renderNotice() {
+        const notice = byId("storage-error");
+        notice.textContent = errorMessage;
+        notice.hidden = !errorMessage;
+      }
+
+      function loadTelegramWorkerUrl() {
+        try {
+          return localStorage.getItem(TELEGRAM_WORKER_KEY) || "";
+        } catch (error) {
+          errorMessage = `Pengaturan Telegram tidak dapat dibaca: ${error.message}`;
+          return "";
+        }
+      }
+
+      async function sendTelegramNotification(transaction) {
+        if (!telegramWorkerUrl) return;
+        try {
+          const response = await fetch(telegramWorkerUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=UTF-8" },
+            body: JSON.stringify(transaction)
+          });
+          let result;
+          try {
+            result = await response.json();
+          } catch {
+            throw new Error(`Worker memberikan respons yang tidak dapat dibaca (HTTP ${response.status}).`);
+          }
+          if (!response.ok || !result.ok) {
+            throw new Error(result.error || `Worker merespons HTTP ${response.status}.`);
+          }
+        } catch (error) {
+          errorMessage = `Transaksi tersimpan, tetapi notifikasi Telegram gagal dikirim: ${error.message}`;
+          renderNotice();
+        }
+      }
+
+      function saveTelegramWorkerUrl(value) {
+        try {
+          if (value) localStorage.setItem(TELEGRAM_WORKER_KEY, value);
+          else localStorage.removeItem(TELEGRAM_WORKER_KEY);
+          telegramWorkerUrl = value;
+          errorMessage = "";
+          return true;
+        } catch (error) {
+          errorMessage = `Pengaturan Telegram gagal disimpan: ${error.message}`;
+          renderNotice();
+          return false;
+        }
+      }
+
+      function setupCategories() {
+        const categoryFilter = byId("category-filter");
+        const categorySelect = byId("expense-category");
+        for (const category of categories) {
+          const filterOption = document.createElement("option");
+          filterOption.value = category;
+          filterOption.textContent = category;
+          categoryFilter.append(filterOption);
+
+          const formOption = document.createElement("option");
+          formOption.value = category;
+          formOption.textContent = category;
+          categorySelect.append(formOption);
+        }
+      }
+
+      function getFilteredExpenses() {
+        const month = byId("month-filter").value;
+        const category = byId("category-filter").value;
+        const query = byId("search-filter").value.trim().toLocaleLowerCase("id-ID");
+        return [...expenses]
+          .filter((item) => (!month || item.date.startsWith(month))
+            && (!category || item.category === category)
+            && (!query || `${item.name} ${item.category}`.toLocaleLowerCase("id-ID").includes(query)))
+          .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
+      }
+
+      function renderSummary() {
+        const monthExpenses = expenses.filter((item) => item.date.startsWith(currentMonth));
+        const total = monthExpenses.reduce((sum, item) => sum + item.amount, 0);
+        byId("monthly-total").textContent = money.format(total);
+        byId("monthly-count").textContent = new Intl.NumberFormat("id-ID").format(monthExpenses.length);
+        byId("monthly-average").textContent = money.format(monthExpenses.length ? Math.round(total / monthExpenses.length) : 0);
+        byId("month-label").textContent = monthFormatter.format(new Date(`${currentMonth}-01T00:00:00`));
+      }
+
+      function renderList() {
+        const visible = getFilteredExpenses();
+        const tbody = byId("expense-rows");
+        tbody.innerHTML = visible.map((item) => `
+          <tr>
+            <td><div class="expense-name">${escapeHtml(item.name)}</div></td>
+            <td>${dateFormatter.format(new Date(`${item.date}T00:00:00Z`))}</td>
+            <td>${escapeHtml(item.category)}</td>
+            <td class="amount">${money.format(item.amount)}</td>
+            <td>
+              <div class="actions">
+                <button class="icon-button" type="button" data-edit="${escapeHtml(item.id)}" aria-label="Ubah ${escapeHtml(item.name)}" title="Ubah">✎</button>
+                <button class="icon-button delete" type="button" data-delete="${escapeHtml(item.id)}" aria-label="Hapus ${escapeHtml(item.name)}" title="Hapus">⌫</button>
+              </div>
+            </td>
+          </tr>`).join("");
+        const empty = visible.length === 0;
+        byId("empty-state").hidden = !empty;
+        byId("empty-title").textContent = expenses.length ? "Tidak ada biaya yang cocok" : "Belum ada biaya yang dicatat";
+        byId("empty-message").textContent = expenses.length
+          ? "Coba ubah filter atau kata pencarian."
+          : "Catat pengeluaran pertama tempat les Anda.";
+        byId("results-count").textContent = `Menampilkan ${new Intl.NumberFormat("id-ID").format(visible.length)} biaya`;
+        byId("filtered-total").textContent = `Total: ${money.format(visible.reduce((sum, item) => sum + item.amount, 0))}`;
+        renderSummary();
+        renderNotice();
+      }
+
+      function notifyExpenseAdded(expense) {
+        return sendTelegramNotification({
+          type: "expense",
+          label: expense.name,
+          category: expense.category,
+          amount: expense.amount,
+          date: expense.date
+        });
+      }
+
+      function notifyPaymentAdded(payment, student) {
+        return sendTelegramNotification({
+          type: "payment",
+          label: student.name,
+          amount: payment.amount,
+          date: payment.date,
+          month: payment.month
+        });
+      }
+
+      function getPaymentFor(studentId, month) {
+        const records = payments.filter((item) => item.studentId === studentId && item.month === month);
+        if (!records.length) return null;
+        return {
+          amount: records.reduce((sum, item) => sum + item.amount, 0),
+          date: records.reduce((latest, item) => item.date > latest ? item.date : latest, records[0].date)
+        };
+      }
+
+      function getVisibleStudents() {
+        const query = byId("student-search").value.trim().toLocaleLowerCase("id-ID");
+        return [...students]
+          .filter((student) => !query || student.name.toLocaleLowerCase("id-ID").includes(query))
+          .sort((a, b) => a.name.localeCompare(b.name, "id"));
+      }
+
+      function renderPayments() {
+        const month = byId("payment-month-filter").value || currentMonth;
+        const visible = getVisibleStudents();
+        const paid = students.map((student) => getPaymentFor(student.id, month)).filter(Boolean);
+        const fullyPaidCount = students.filter((student) => {
+          const payment = getPaymentFor(student.id, month);
+          return payment && payment.amount >= student.monthlyFee;
+        }).length;
+        const expected = students.reduce((sum, student) => sum + student.monthlyFee, 0);
+        const received = paid.reduce((sum, payment) => sum + payment.amount, 0);
+        const pending = Math.max(0, expected - students.reduce((sum, student) => {
+          const payment = getPaymentFor(student.id, month);
+          return sum + (payment ? Math.min(payment.amount, student.monthlyFee) : 0);
+        }, 0));
+        byId("payment-expected").textContent = money.format(expected);
+        byId("payment-received").textContent = money.format(received);
+        byId("payment-pending").textContent = money.format(pending);
+        byId("payment-month-label").textContent = monthFormatter.format(new Date(`${month}-01T00:00:00`));
+        byId("payment-paid-count").textContent = `${fullyPaidCount} dari ${students.length} siswa lunas`;
+        byId("payment-pending-count").textContent = `${students.length - fullyPaidCount} siswa belum lunas`;
+
+        byId("student-rows").innerHTML = visible.map((student) => {
+          const payment = getPaymentFor(student.id, month);
+          return `
+            <tr>
+              <td><button class="student-name-link" type="button" data-student-history="${escapeHtml(student.id)}" aria-label="Lihat riwayat pembayaran ${escapeHtml(student.name)}">${escapeHtml(student.name)}</button></td>
+              <td class="amount">${money.format(student.monthlyFee)}</td>
+              <td><span class="payment-status ${payment && payment.amount >= student.monthlyFee ? "paid" : "unpaid"}">${payment && payment.amount >= student.monthlyFee ? "✓ Lunas" : payment ? "◷ Sebagian" : "● Belum bayar"}</span></td>
+              <td class="amount">${money.format(Math.max(0, student.monthlyFee - (payment ? payment.amount : 0)))}</td>
+              <td>${payment ? dateFormatter.format(new Date(`${payment.date}T00:00:00Z`)) : "—"}</td>
+              <td>
+                <div class="student-actions">
+                  ${payment && payment.amount >= student.monthlyFee
+                    ? `<button class="payment-action danger" type="button" data-unpay="${escapeHtml(student.id)}">Batalkan</button>`
+                    : `<button class="payment-action" type="button" data-pay="${escapeHtml(student.id)}">${payment ? "Tambah bayar" : "Catat bayar"}</button>`}
+                  <button class="icon-button" type="button" data-edit-student="${escapeHtml(student.id)}" aria-label="Ubah ${escapeHtml(student.name)}" title="Ubah siswa">✎</button>
+                  <button class="icon-button delete" type="button" data-delete-student="${escapeHtml(student.id)}" aria-label="Hapus ${escapeHtml(student.name)}" title="Hapus siswa">⌫</button>
+                </div>
+              </td>
+            </tr>`;
+        }).join("");
+
+        const empty = visible.length === 0;
+        byId("students-empty-state").hidden = !empty;
+        byId("students-empty-title").textContent = students.length ? "Siswa tidak ditemukan" : "Belum ada siswa";
+        byId("students-empty-message").textContent = students.length
+          ? "Coba ubah kata pencarian."
+          : "Tambahkan siswa untuk mulai mencatat pembayaran bulanan.";
+        byId("students-count").textContent = `${visible.length} dari ${students.length} siswa`;
+        byId("payment-filtered-total").textContent = `Sudah diterima: ${money.format(received)}`;
+        renderNotice();
+      }
+
+      function openStudentForm(student) {
+        byId("student-form").reset();
+        byId("student-form-error").hidden = true;
+        byId("student-id").value = student ? student.id : "";
+        byId("student-dialog-title").textContent = student ? "Ubah data siswa" : "Tambah siswa";
+        byId("student-name").value = student ? student.name : "";
+        byId("student-fee").value = student ? String(student.monthlyFee) : "";
+        byId("student-dialog").showModal();
+        byId("student-name").focus();
+      }
+
+      function openPaymentForm(student) {
+        const month = byId("payment-month-filter").value || currentMonth;
+        byId("payment-form").reset();
+        clearPaymentProofPreview();
+        byId("payment-form-error").hidden = true;
+        byId("payment-student-id").value = student.id;
+        byId("payment-dialog-description").textContent =
+          `${student.name} · ${monthFormatter.format(new Date(`${month}-01T00:00:00`))} · Tarif ${money.format(student.monthlyFee)}`;
+        const existingPayment = getPaymentFor(student.id, month);
+        byId("payment-amount").value = String(Math.max(1, student.monthlyFee - (existingPayment ? existingPayment.amount : 0)));
+        byId("payment-date").value = todayString;
+        byId("payment-dialog").showModal();
+        byId("payment-amount").focus();
+      }
+
+      function clearPaymentProofPreview() {
+        if (paymentProofPreviewUrl) URL.revokeObjectURL(paymentProofPreviewUrl);
+        paymentProofPreviewUrl = "";
+        byId("payment-proof-preview").removeAttribute("src");
+        byId("payment-proof-preview").hidden = true;
+      }
+
+      function isSupportedImage(file) {
+        return ["image/jpeg", "image/png", "image/webp", "image/gif", "image/bmp"].includes(file.type);
+      }
+
+      function showPaymentProofPreview() {
+        clearPaymentProofPreview();
+        const file = byId("payment-proof").files[0];
+        if (!file) return;
+        if (!isSupportedImage(file)) {
+          byId("payment-form-error").textContent = "Pilih foto berformat JPG, PNG, WebP, GIF, atau BMP.";
+          byId("payment-form-error").hidden = false;
+          byId("payment-proof").value = "";
+          return;
+        }
+        if (file.size > MAX_EVIDENCE_SIZE) {
+          byId("payment-form-error").textContent = "Ukuran foto maksimal 10 MB.";
+          byId("payment-form-error").hidden = false;
+          byId("payment-proof").value = "";
+          return;
+        }
+        byId("payment-form-error").hidden = true;
+        paymentProofPreviewUrl = URL.createObjectURL(file);
+        byId("payment-proof-preview").src = paymentProofPreviewUrl;
+        byId("payment-proof-preview").hidden = false;
+      }
+
+      function openPaymentHistory(student) {
+        const history = payments
+          .filter((payment) => payment.studentId === student.id)
+          .sort((a, b) => b.month.localeCompare(a.month) || b.date.localeCompare(a.date));
+        byId("payment-history-title").textContent = `Riwayat pembayaran — ${student.name}`;
+        byId("payment-history-subtitle").textContent = `Tarif saat ini: ${money.format(student.monthlyFee)} per bulan`;
+        byId("payment-history-total").textContent = money.format(
+          history.reduce((sum, payment) => sum + payment.amount, 0)
+        );
+        byId("payment-history-rows").innerHTML = history.map((payment) => `
+          <tr>
+            <td>${escapeHtml(monthFormatter.format(new Date(`${payment.month}-01T00:00:00`)))}</td>
+            <td class="amount">${money.format(payment.amount)}</td>
+            <td>${dateFormatter.format(new Date(`${payment.date}T00:00:00Z`))}</td>
+            <td>${payment.evidenceId
+              ? `<button class="payment-action" type="button" data-view-evidence="${escapeHtml(payment.evidenceId)}" data-evidence-caption="${escapeHtml(`${student.name} · ${monthFormatter.format(new Date(`${payment.month}-01T00:00:00`))} · ${money.format(payment.amount)}`)}">Lihat foto</button>`
+              : "—"}</td>
+          </tr>`).join("");
+        byId("payment-history-empty").hidden = history.length > 0;
+        byId("payment-history-dialog").showModal();
+      }
+
+      async function viewPaymentEvidence(button) {
+        try {
+          const record = await readEvidence(button.dataset.viewEvidence);
+          if (!record || !(record.blob instanceof Blob)) {
+            throw new Error("Foto bukti tidak ditemukan di penyimpanan browser.");
+          }
+          if (proofImageUrl) URL.revokeObjectURL(proofImageUrl);
+          proofImageUrl = URL.createObjectURL(record.blob);
+          byId("proof-dialog-caption").textContent = button.dataset.evidenceCaption;
+          byId("proof-image").src = proofImageUrl;
+          byId("proof-dialog").showModal();
+        } catch (error) {
+          errorMessage = `Bukti pembayaran gagal dibuka: ${error.message}`;
+          renderNotice();
+        }
+      }
+
+      function downloadPaymentsCsv() {
+        const month = byId("payment-month-filter").value || currentMonth;
+        if (!students.length) {
+          errorMessage = "Belum ada data siswa untuk diunduh.";
+          renderNotice();
+          return;
+        }
+        errorMessage = "";
+        const csvValue = (value) => `"${String(value).replace(/"/g, '""')}"`;
+        const csv = [
+          ["Bulan", "Nama siswa", "Biaya bulanan (Rp)", "Status", "Jumlah dibayar (Rp)", "Tanggal pembayaran"],
+          ...getVisibleStudents().map((student) => {
+            const payment = getPaymentFor(student.id, month);
+            const status = !payment ? "Belum bayar" : payment.amount >= student.monthlyFee ? "Lunas" : "Sebagian";
+            return [month, student.name, student.monthlyFee, status, payment ? payment.amount : 0, payment ? payment.date : ""];
+          })
+        ].map((row) => row.map(csvValue).join(",")).join("\r\n");
+        const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `pembayaran-siswa-${month}.csv`;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        renderNotice();
+      }
+
+      function openForm(item) {
+        byId("expense-form").reset();
+        byId("form-error").hidden = true;
+        byId("expense-id").value = item ? item.id : "";
+        byId("dialog-title").textContent = item ? "Ubah biaya" : "Catat biaya";
+        byId("expense-name").value = item ? item.name : "";
+        byId("expense-amount").value = item ? String(item.amount) : "";
+        byId("expense-date").value = item ? item.date : todayString;
+        byId("expense-category").value = item ? item.category : categories[0];
+        byId("expense-dialog").showModal();
+        byId("expense-name").focus();
+      }
+
+      function downloadCsv() {
+        const rows = getFilteredExpenses();
+        if (!rows.length) {
+          errorMessage = "Tidak ada biaya untuk diunduh pada filter ini.";
+          renderNotice();
+          return;
+        }
+        errorMessage = "";
+        const csvValue = (value) => `"${String(value).replace(/"/g, '""')}"`;
+        const csv = [
+          ["Tanggal", "Nama biaya", "Kategori", "Jumlah (Rp)"],
+          ...rows.map((item) => [item.date, item.name, item.category, item.amount])
+        ].map((row) => row.map(csvValue).join(",")).join("\r\n");
+        const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `biaya-operasional-${byId("month-filter").value || "semua"}.csv`;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        renderNotice();
+      }
+
+      setupCategories();
+      byId("month-filter").value = currentMonth;
+      byId("payment-month-filter").value = currentMonth;
+      document.querySelectorAll(".view-nav [data-view]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const showingPayments = button.dataset.view === "payments-view";
+          byId("expenses-view").hidden = showingPayments;
+          byId("payments-view").hidden = !showingPayments;
+          byId("add-expense").hidden = showingPayments;
+          document.querySelectorAll(".view-nav [data-view]").forEach((navButton) => {
+            if (navButton === button) navButton.setAttribute("aria-current", "page");
+            else navButton.removeAttribute("aria-current");
+          });
+        });
+      });
+      byId("add-expense").addEventListener("click", () => openForm(null));
+      byId("close-dialog").addEventListener("click", () => byId("expense-dialog").close());
+      byId("cancel-dialog").addEventListener("click", () => byId("expense-dialog").close());
+      byId("expense-dialog").addEventListener("click", (event) => {
+        if (event.target === byId("expense-dialog")) byId("expense-dialog").close();
+      });
+      byId("expense-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const id = byId("expense-id").value;
+        const name = byId("expense-name").value.trim();
+        const amount = Number(byId("expense-amount").value);
+        const date = byId("expense-date").value;
+        const category = byId("expense-category").value;
+        if (!name || !Number.isSafeInteger(amount) || amount <= 0 || !date || !categories.includes(category)) {
+          byId("form-error").textContent = "Periksa kembali nama, jumlah, tanggal, dan kategori biaya.";
+          byId("form-error").hidden = false;
+          return;
+        }
+        const previous = expenses;
+        const entry = { id: id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, amount, date, category };
+        expenses = id
+          ? expenses.map((item) => item.id === id ? entry : item)
+          : [...expenses, entry];
+        if (!saveExpenses()) {
+          expenses = previous;
+          return;
+        }
+        byId("expense-dialog").close();
+        renderList();
+        void notifyExpenseAdded(entry);
+      });
+      byId("expense-rows").addEventListener("click", (event) => {
+        const editButton = event.target.closest("[data-edit]");
+        const deleteButton = event.target.closest("[data-delete]");
+        if (editButton) {
+          const item = expenses.find((entry) => entry.id === editButton.dataset.edit);
+          if (item) openForm(item);
+        } else if (deleteButton) {
+          const item = expenses.find((entry) => entry.id === deleteButton.dataset.delete);
+          if (item && window.confirm(`Hapus catatan "${item.name}"?`)) {
+            const previous = expenses;
+            expenses = expenses.filter((entry) => entry.id !== item.id);
+            if (!saveExpenses()) expenses = previous;
+            renderList();
+          }
+        }
+      });
+      ["month-filter", "category-filter", "search-filter"].forEach((id) => {
+        byId(id).addEventListener("input", renderList);
+        byId(id).addEventListener("change", renderList);
+      });
+      byId("export-csv").addEventListener("click", downloadCsv);
+      byId("add-student").addEventListener("click", () => openStudentForm(null));
+      byId("close-student-dialog").addEventListener("click", () => byId("student-dialog").close());
+      byId("cancel-student-dialog").addEventListener("click", () => byId("student-dialog").close());
+      byId("close-payment-dialog").addEventListener("click", () => byId("payment-dialog").close());
+      byId("cancel-payment-dialog").addEventListener("click", () => byId("payment-dialog").close());
+      byId("payment-dialog").addEventListener("close", clearPaymentProofPreview);
+      byId("close-payment-history").addEventListener("click", () => byId("payment-history-dialog").close());
+      byId("payment-history-dialog").addEventListener("click", (event) => {
+        if (event.target === byId("payment-history-dialog")) byId("payment-history-dialog").close();
+      });
+      byId("close-proof-dialog").addEventListener("click", () => byId("proof-dialog").close());
+      byId("proof-dialog").addEventListener("close", () => {
+        if (proofImageUrl) URL.revokeObjectURL(proofImageUrl);
+        proofImageUrl = "";
+        byId("proof-image").removeAttribute("src");
+      });
+      byId("payment-proof").addEventListener("change", showPaymentProofPreview);
+      byId("telegram-settings").addEventListener("click", () => {
+        byId("telegram-settings-error").hidden = true;
+        byId("telegram-worker-url").value = telegramWorkerUrl;
+        byId("telegram-settings-dialog").showModal();
+      });
+      byId("close-telegram-settings").addEventListener("click", () => byId("telegram-settings-dialog").close());
+      byId("cancel-telegram-settings").addEventListener("click", () => byId("telegram-settings-dialog").close());
+      byId("telegram-settings-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = byId("telegram-worker-url").value.trim();
+        if (value) {
+          let parsedUrl;
+          try {
+            parsedUrl = new URL(value);
+          } catch {
+            byId("telegram-settings-error").textContent = "Masukkan URL Worker yang valid.";
+            byId("telegram-settings-error").hidden = false;
+            return;
+          }
+          if (parsedUrl.protocol !== "https:") {
+            byId("telegram-settings-error").textContent = "URL Worker harus menggunakan HTTPS.";
+            byId("telegram-settings-error").hidden = false;
+            return;
+          }
+        }
+        if (saveTelegramWorkerUrl(value)) byId("telegram-settings-dialog").close();
+      });
+      byId("payment-history-rows").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-view-evidence]");
+        if (button) viewPaymentEvidence(button);
+      });
+      byId("student-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const id = byId("student-id").value;
+        const name = byId("student-name").value.trim();
+        const monthlyFee = Number(byId("student-fee").value);
+        if (!name || !Number.isSafeInteger(monthlyFee) || monthlyFee <= 0) {
+          byId("student-form-error").textContent = "Nama siswa dan biaya bulanan harus diisi dengan benar.";
+          byId("student-form-error").hidden = false;
+          return;
+        }
+        const previous = students;
+        const student = { id: id || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name, monthlyFee };
+        students = id
+          ? students.map((item) => item.id === id ? student : item)
+          : [...students, student];
+        if (!saveStudents()) {
+          students = previous;
+          return;
+        }
+        byId("student-dialog").close();
+        renderPayments();
+      });
+      byId("payment-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const studentId = byId("payment-student-id").value;
+        const amount = Number(byId("payment-amount").value);
+        const date = byId("payment-date").value;
+        const month = byId("payment-month-filter").value || currentMonth;
+        const file = byId("payment-proof").files[0];
+        const student = students.find((item) => item.id === studentId);
+        if (!student || !Number.isSafeInteger(amount) || amount <= 0 || !date || !file) {
+          byId("payment-form-error").textContent = !file
+            ? "Lampirkan foto bukti pembayaran terlebih dahulu."
+            : "Periksa kembali jumlah pembayaran dan tanggalnya.";
+          byId("payment-form-error").hidden = false;
+          return;
+        }
+        if (!isSupportedImage(file) || file.size > MAX_EVIDENCE_SIZE) {
+          byId("payment-form-error").textContent = file.size > MAX_EVIDENCE_SIZE
+            ? "Ukuran foto maksimal 10 MB."
+            : "Pilih foto berformat JPG, PNG, WebP, GIF, atau BMP.";
+          byId("payment-form-error").hidden = false;
+          return;
+        }
+        const previous = payments;
+        const submitButton = byId("payment-form").querySelector('[type="submit"]');
+        submitButton.disabled = true;
+        byId("payment-form-error").hidden = true;
+        const payment = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          studentId,
+          month,
+          amount,
+          date,
+          evidenceId: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+        };
+        try {
+          await storeEvidence(payment.evidenceId, file);
+          payments = [...payments, payment];
+          if (!savePayments()) {
+            payments = previous;
+            try {
+              await removeEvidence(payment.evidenceId);
+            } catch (error) {
+              errorMessage += ` Foto bukti sementara tidak dapat dibersihkan: ${error.message}`;
+            }
+            byId("payment-form-error").textContent = errorMessage;
+            byId("payment-form-error").hidden = false;
+            renderNotice();
+            return;
+          }
+          byId("payment-dialog").close();
+          renderPayments();
+          void notifyPaymentAdded(payment, student);
+        } catch (error) {
+          errorMessage = `Pembayaran gagal disimpan: ${error.message}`;
+          byId("payment-form-error").textContent = errorMessage;
+          byId("payment-form-error").hidden = false;
+          renderNotice();
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+      byId("student-rows").addEventListener("click", async (event) => {
+        const payButton = event.target.closest("[data-pay]");
+        const unpayButton = event.target.closest("[data-unpay]");
+        const editButton = event.target.closest("[data-edit-student]");
+        const deleteButton = event.target.closest("[data-delete-student]");
+        const historyButton = event.target.closest("[data-student-history]");
+        const month = byId("payment-month-filter").value || currentMonth;
+        if (historyButton) {
+          const student = students.find((item) => item.id === historyButton.dataset.studentHistory);
+          if (student) openPaymentHistory(student);
+        } else if (payButton) {
+          const student = students.find((item) => item.id === payButton.dataset.pay);
+          if (student) openPaymentForm(student);
+        } else if (unpayButton) {
+          const student = students.find((item) => item.id === unpayButton.dataset.unpay);
+          if (student && window.confirm(`Batalkan catatan pembayaran ${student.name} untuk ${monthFormatter.format(new Date(`${month}-01T00:00:00`))}?`)) {
+            const previous = payments;
+            const removed = payments.filter((item) => item.studentId === student.id && item.month === month);
+            payments = payments.filter((item) => !(item.studentId === student.id && item.month === month));
+            if (!savePayments()) {
+              payments = previous;
+            } else {
+              await removeEvidenceForPayments(removed);
+            }
+            renderPayments();
+          }
+        } else if (editButton) {
+          const student = students.find((item) => item.id === editButton.dataset.editStudent);
+          if (student) openStudentForm(student);
+        } else if (deleteButton) {
+          const student = students.find((item) => item.id === deleteButton.dataset.deleteStudent);
+          if (student && window.confirm(`Hapus siswa ${student.name} beserta seluruh riwayat pembayarannya?`)) {
+            const previousStudents = students;
+            const previousPayments = payments;
+            const removedPayments = payments.filter((item) => item.studentId === student.id);
+            students = students.filter((item) => item.id !== student.id);
+            payments = payments.filter((item) => item.studentId !== student.id);
+            if (!saveStudents()) {
+              students = previousStudents;
+              payments = previousPayments;
+            } else if (!savePayments()) {
+              students = previousStudents;
+              payments = previousPayments;
+              saveStudents();
+            } else {
+              await removeEvidenceForPayments(removedPayments);
+            }
+            renderPayments();
+          }
+        }
+      });
+      byId("payment-month-filter").addEventListener("input", renderPayments);
+      byId("payment-month-filter").addEventListener("change", renderPayments);
+      byId("student-search").addEventListener("input", renderPayments);
+      byId("export-payments").addEventListener("click", downloadPaymentsCsv);
+      renderList();
+      renderPayments();
+    })();
+  </script>
+</body>
+</html>
